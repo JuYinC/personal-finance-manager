@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-users-table.yml
+  - include:
+      file: db/changelog/changes/002-create-accounts-table.yml
+  - include:
+      file: db/changelog/changes/003-create-categories-table.yml
+  - include:
+      file: db/changelog/changes/004-create-transactions-table.yml
+  - include:
+      file: db/changelog/changes/005-create-budgets-table.yml
+  - include:
+      file: db/changelog/changes/006-seed-default-categories.yml

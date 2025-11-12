@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-budgets-table
+      author: finance-manager
+      changes:
+        - createTable:
+            tableName: budgets
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(15, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: month
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: year
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: budgets
+            baseColumnNames: user_id
+            constraintName: fk_budgets_user
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: budgets
+            baseColumnNames: category_id
+            constraintName: fk_budgets_category
+            referencedTableName: categories
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addUniqueConstraint:
+            tableName: budgets
+            columnNames: user_id, category_id, month, year
+            constraintName: uk_budgets_user_category_month_year
+
+        - createIndex:
+            indexName: idx_budgets_user_id
+            tableName: budgets
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_budgets_category_id
+            tableName: budgets
+            columns:
+              - column:
+                  name: category_id
+
+        - createIndex:
+            indexName: idx_budgets_month_year
+            tableName: budgets
+            columns:
+              - column:
+                  name: month
+              - column:
+                  name: year

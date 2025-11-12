@@ -1,0 +1,80 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-categories-table
+      author: finance-manager
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: icon
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: color
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_system
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: categories
+            baseColumnNames: user_id
+            constraintName: fk_categories_user
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            indexName: idx_categories_user_id
+            tableName: categories
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_categories_type
+            tableName: categories
+            columns:
+              - column:
+                  name: type
+
+        - createIndex:
+            indexName: idx_categories_is_system
+            tableName: categories
+            columns:
+              - column:
+                  name: is_system

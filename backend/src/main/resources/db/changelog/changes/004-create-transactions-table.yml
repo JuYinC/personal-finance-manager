@@ -1,0 +1,112 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-transactions-table
+      author: finance-manager
+      changes:
+        - createTable:
+            tableName: transactions
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(15, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: transaction_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: transactions
+            baseColumnNames: account_id
+            constraintName: fk_transactions_account
+            referencedTableName: accounts
+            referencedColumnNames: id
+            onDelete: RESTRICT
+
+        - addForeignKeyConstraint:
+            baseTableName: transactions
+            baseColumnNames: category_id
+            constraintName: fk_transactions_category
+            referencedTableName: categories
+            referencedColumnNames: id
+            onDelete: RESTRICT
+
+        - createIndex:
+            indexName: idx_transactions_account_id
+            tableName: transactions
+            columns:
+              - column:
+                  name: account_id
+
+        - createIndex:
+            indexName: idx_transactions_category_id
+            tableName: transactions
+            columns:
+              - column:
+                  name: category_id
+
+        - createIndex:
+            indexName: idx_transactions_type
+            tableName: transactions
+            columns:
+              - column:
+                  name: type
+
+        - createIndex:
+            indexName: idx_transactions_transaction_date
+            tableName: transactions
+            columns:
+              - column:
+                  name: transaction_date
+
+        - createIndex:
+            indexName: idx_transactions_deleted_at
+            tableName: transactions
+            columns:
+              - column:
+                  name: deleted_at
