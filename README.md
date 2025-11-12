@@ -1,12 +1,22 @@
 # Personal Finance Manager
 
-A comprehensive REST API for managing personal finances, built with Spring Boot 3.x, PostgreSQL, and Docker.
+A comprehensive full-stack application for managing personal finances, built with Vue.js 3, Spring Boot 3.x, PostgreSQL, and Docker.
 
 ## Overview
 
-Personal Finance Manager is a full-featured backend application that helps users track their income, expenses, budgets, and financial health. The application provides a secure, RESTful API with JWT authentication, comprehensive transaction management, and detailed financial reporting.
+Personal Finance Manager is a full-featured web application that helps users track their income, expenses, budgets, and financial health. The application provides a modern, responsive Vue.js frontend and a secure RESTful API backend with JWT authentication, comprehensive transaction management, and detailed financial reporting.
 
 ## Tech Stack
+
+### Frontend
+- **Vue 3** - Progressive JavaScript framework
+- **Vite** - Next generation frontend tooling
+- **Vue Router** - Official router for Vue.js
+- **Pinia** - Vue state management
+- **Axios** - HTTP client
+- **Element Plus** - Vue 3 UI component library
+- **Chart.js** - Data visualization
+- **Nginx** - Web server (production)
 
 ### Backend
 - **Java 17** - Programming language
@@ -112,17 +122,23 @@ docker-compose up --build
 ```
 
 The application will:
-1. Build the Spring Boot application
-2. Start PostgreSQL database
-3. Run Liquibase migrations
-4. Seed default categories
-5. Start the REST API server
+1. Build the Vue.js frontend
+2. Build the Spring Boot backend
+3. Start PostgreSQL database
+4. Run Liquibase migrations
+5. Seed default categories
+6. Start all services
 
 ### 4. Access the Application
 
-- **API Base URL:** http://localhost:8080
+- **Frontend Web App:** http://localhost
+- **Backend API:** http://localhost:8080
 - **Swagger UI:** http://localhost:8080/swagger-ui.html
 - **API Docs (JSON):** http://localhost:8080/v3/api-docs
+
+### 5. Default Login
+
+After the application starts, register a new account via the web interface at http://localhost
 
 ## API Documentation
 
@@ -199,58 +215,54 @@ For detailed request/response examples, visit the Swagger UI at http://localhost
 ## Project Structure
 
 ```
-backend/
-├── src/
-│   ├── main/
-│   │   ├── java/com/finance/manager/
-│   │   │   ├── config/          # Configuration classes
-│   │   │   │   ├── CorsConfig.java
-│   │   │   │   ├── OpenApiConfig.java
-│   │   │   │   └── SecurityConfig.java
-│   │   │   ├── controller/      # REST controllers
-│   │   │   │   ├── AuthController.java
-│   │   │   │   ├── UserController.java
-│   │   │   │   ├── AccountController.java
-│   │   │   │   ├── CategoryController.java
-│   │   │   │   ├── TransactionController.java
-│   │   │   │   ├── BudgetController.java
-│   │   │   │   └── ReportController.java
-│   │   │   ├── dto/             # Data Transfer Objects
-│   │   │   │   ├── auth/
-│   │   │   │   ├── user/
-│   │   │   │   ├── account/
-│   │   │   │   ├── category/
-│   │   │   │   ├── transaction/
-│   │   │   │   ├── budget/
-│   │   │   │   └── report/
-│   │   │   ├── entity/          # JPA entities
-│   │   │   │   ├── User.java
-│   │   │   │   ├── Account.java
-│   │   │   │   ├── Category.java
-│   │   │   │   ├── Transaction.java
-│   │   │   │   └── Budget.java
-│   │   │   ├── repository/      # JPA repositories
-│   │   │   ├── service/         # Business logic
-│   │   │   ├── security/        # JWT & security
-│   │   │   │   ├── JwtUtil.java
-│   │   │   │   ├── JwtAuthenticationFilter.java
-│   │   │   │   └── UserDetailsServiceImpl.java
-│   │   │   ├── exception/       # Exception handling
-│   │   │   │   ├── GlobalExceptionHandler.java
-│   │   │   │   ├── ResourceNotFoundException.java
-│   │   │   │   ├── UnauthorizedException.java
-│   │   │   │   └── ValidationException.java
-│   │   │   └── FinanceManagerApplication.java
-│   │   └── resources/
-│   │       ├── application.yml
-│   │       └── db/changelog/    # Liquibase migrations
-│   │           ├── db.changelog-master.yml
-│   │           └── changes/
-│   └── test/                    # Test files
-├── Dockerfile
-├── .dockerignore
-├── build.gradle
-└── settings.gradle
+personal-finance-manager/
+├── frontend/                    # Vue.js frontend
+│   ├── src/
+│   │   ├── assets/             # Static assets
+│   │   ├── components/         # Reusable components
+│   │   ├── router/             # Vue Router config
+│   │   ├── services/           # API services
+│   │   ├── stores/             # Pinia stores
+│   │   ├── utils/              # Utilities
+│   │   ├── views/              # Page components
+│   │   │   ├── Login.vue
+│   │   │   ├── Register.vue
+│   │   │   ├── Dashboard.vue
+│   │   │   ├── Accounts.vue
+│   │   │   ├── Transactions.vue
+│   │   │   ├── Categories.vue
+│   │   │   ├── Budgets.vue
+│   │   │   ├── Reports.vue
+│   │   │   └── Profile.vue
+│   │   ├── App.vue
+│   │   └── main.js
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── vite.config.js
+│   └── package.json
+│
+├── backend/                     # Spring Boot backend
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/finance/manager/
+│   │   │   │   ├── config/          # Configuration classes
+│   │   │   │   ├── controller/      # REST controllers
+│   │   │   │   ├── dto/             # Data Transfer Objects
+│   │   │   │   ├── entity/          # JPA entities
+│   │   │   │   ├── repository/      # JPA repositories
+│   │   │   │   ├── service/         # Business logic
+│   │   │   │   ├── security/        # JWT & security
+│   │   │   │   └── exception/       # Exception handling
+│   │   │   └── resources/
+│   │   │       ├── application.yml
+│   │   │       └── db/changelog/    # Liquibase migrations
+│   │   └── test/                    # Test files
+│   ├── Dockerfile
+│   └── build.gradle
+│
+├── docker-compose.yml           # Docker orchestration
+├── .env.example                 # Environment variables template
+└── README.md                    # This file
 ```
 
 ## Database Schema
@@ -367,6 +379,20 @@ Ensure PostgreSQL is running and credentials in `.env` are correct.
 ### Liquibase Migration Failures
 Check database permissions and ensure no manual schema changes conflict with migrations.
 
+## Screenshots
+
+### Dashboard
+Modern dashboard with financial overview, charts, and recent transactions.
+
+### Transactions
+Comprehensive transaction management with advanced filtering and pagination.
+
+### Budgets
+Visual budget tracking with progress indicators and over-budget warnings.
+
+### Reports
+Interactive charts and detailed financial analytics.
+
 ## Future Enhancements
 
 - [ ] Recurring transactions
@@ -378,9 +404,12 @@ Check database permissions and ensure no manual schema changes conflict with mig
 - [ ] Investment tracking
 - [ ] Bill reminders
 - [ ] Financial goals
-- [ ] Mobile app integration
-- [ ] Data visualization dashboard
+- [ ] Mobile app
+- [ ] Advanced data visualization
 - [ ] Machine learning insights
+- [ ] Email notifications
+- [ ] Dark mode
+- [ ] Multi-language support
 
 ## Contributing
 
