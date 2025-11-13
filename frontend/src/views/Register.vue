@@ -109,7 +109,7 @@ const rules = {
   ],
   password: [
     { required: true, message: 'Please enter your password', trigger: 'blur' },
-    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
+    { min: 8, message: 'Password must be at least 8 characters', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: 'Please confirm your password', trigger: 'blur' },
