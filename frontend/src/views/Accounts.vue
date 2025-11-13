@@ -92,6 +92,7 @@
 
         <el-form-item label="Currency" prop="currency">
           <el-select v-model="form.currency" placeholder="Select currency" style="width: 100%">
+            <el-option label="TWD - Taiwan Dollar" value="TWD" />
             <el-option label="USD - US Dollar" value="USD" />
             <el-option label="EUR - Euro" value="EUR" />
             <el-option label="GBP - British Pound" value="GBP" />
@@ -128,7 +129,7 @@ const form = reactive({
   name: '',
   type: 'BANK',
   balance: 0,
-  currency: 'USD'
+  currency: 'TWD'
 })
 
 const rules = {
@@ -168,7 +169,7 @@ const openDialog = (account = null) => {
     form.name = ''
     form.type = 'BANK'
     form.balance = 0
-    form.currency = 'USD'
+    form.currency = 'TWD'
   }
   dialogVisible.value = true
 }

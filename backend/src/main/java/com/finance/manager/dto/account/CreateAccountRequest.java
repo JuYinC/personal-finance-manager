@@ -29,6 +29,6 @@ public class CreateAccountRequest {
 
     @Size(min = 3, max = 3, message = "Currency must be a 3-letter code")
     @Builder.Default
-    private String currency = "USD";
+    private String currency = "TWD";
 
 }

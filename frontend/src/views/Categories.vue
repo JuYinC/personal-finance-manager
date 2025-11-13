@@ -51,6 +51,13 @@
         :rules="rules"
         label-position="top"
       >
+        <el-form-item label="Type" prop="type">
+          <el-radio-group v-model="form.type">
+            <el-radio-button value="INCOME">Income</el-radio-button>
+            <el-radio-button value="EXPENSE">Expense</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+
         <el-form-item label="Name" prop="name">
           <el-input v-model="form.name" placeholder="e.g., Groceries" />
         </el-form-item>
@@ -96,13 +103,15 @@ const editingId = ref(null)
 const form = reactive({
   name: '',
   icon: '',
-  color: '#409eff'
+  color: '#409eff',
+  type: 'EXPENSE'
 })
 
 const rules = {
   name: [{ required: true, message: 'Please enter category name', trigger: 'blur' }],
   icon: [{ required: true, message: 'Please enter an icon', trigger: 'blur' }],
-  color: [{ required: true, message: 'Please select a color', trigger: 'change' }]
+  color: [{ required: true, message: 'Please select a color', trigger: 'change' }],
+  type: [{ required: true, message: 'Please select a category type', trigger: 'change' }]
 }
 
 const openDialog = (category = null) => {
@@ -112,12 +121,14 @@ const openDialog = (category = null) => {
     form.name = category.name
     form.icon = category.icon
     form.color = category.color
+    form.type = category.type
   } else {
     isEdit.value = false
     editingId.value = null
     form.name = ''
     form.icon = ''
     form.color = '#409eff'
+    form.type = 'EXPENSE'
   }
   dialogVisible.value = true
 }
