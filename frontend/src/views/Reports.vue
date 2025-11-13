@@ -8,8 +8,8 @@
               <span>Category Spending</span>
               <div class="header-controls">
                 <el-radio-group v-model="categoryType" @change="fetchCategoryReport" size="small">
-                  <el-radio-button label="EXPENSE">Expenses</el-radio-button>
-                  <el-radio-button label="INCOME">Income</el-radio-button>
+                  <el-radio-button value="EXPENSE">Expenses</el-radio-button>
+                  <el-radio-button value="INCOME">Income</el-radio-button>
                 </el-radio-group>
               </div>
             </div>
