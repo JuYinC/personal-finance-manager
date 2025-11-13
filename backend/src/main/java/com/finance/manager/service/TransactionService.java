@@ -33,7 +33,8 @@ public class TransactionService {
             UUID accountId, UUID categoryId, TransactionType type,
             LocalDate startDate, LocalDate endDate, Pageable pageable) {
         UUID userId = userService.getCurrentUserId();
-        return transactionRepository.findByFilters(userId, accountId, categoryId, type, startDate, endDate, pageable)
+        String typeString = type != null ? type.name() : null;
+        return transactionRepository.findByFilters(userId, accountId, categoryId, typeString, startDate, endDate, pageable)
                 .map(this::mapToResponse);
     }
 
