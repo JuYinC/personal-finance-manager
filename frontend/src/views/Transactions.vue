@@ -141,8 +141,8 @@
       >
         <el-form-item label="Type" prop="type">
           <el-radio-group v-model="form.type">
-            <el-radio-button label="INCOME">Income</el-radio-button>
-            <el-radio-button label="EXPENSE">Expense</el-radio-button>
+            <el-radio-button value="INCOME">Income</el-radio-button>
+            <el-radio-button value="EXPENSE">Expense</el-radio-button>
           </el-radio-group>
         </el-form-item>
 
