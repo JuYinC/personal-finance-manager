@@ -317,6 +317,33 @@ const fetchTransactions = async () => {
     pagination.total = data.totalElements || 0
   } catch (error) {
     console.error('Failed to fetch transactions:', error)
+
+    // Show detailed error message to user
+    const errorStatus = error.response?.status
+    const errorUrl = error.response?.config?.url || '/transactions'
+
+    if (errorStatus === 502) {
+      ElMessage.error({
+        message: `Failed to load transactions: Server error (502 Bad Gateway) at ${errorUrl}. Please check the backend service.`,
+        duration: 8000,
+        showClose: true
+      })
+    } else if (error.response) {
+      ElMessage.error({
+        message: `Failed to load transactions: ${error.response.data?.message || 'Unknown error'} (${errorStatus})`,
+        duration: 6000,
+        showClose: true
+      })
+    } else {
+      ElMessage.error({
+        message: 'Failed to load transactions. Please check your connection and try again.',
+        duration: 5000
+      })
+    }
+
+    // Set empty data on error
+    transactions.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
