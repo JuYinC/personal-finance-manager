@@ -41,8 +41,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "AND (:type IS NULL OR t.type = :type) " +
            "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
            "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
-           "AND t.deletedAt IS NULL " +
-           "ORDER BY t.transactionDate DESC, t.createdAt DESC",
+           "AND t.deletedAt IS NULL",
            countQuery = "SELECT COUNT(t) FROM Transaction t " +
            "JOIN t.account a " +
            "WHERE a.user.id = :userId " +
