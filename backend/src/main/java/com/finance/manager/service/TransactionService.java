@@ -33,13 +33,7 @@ public class TransactionService {
             UUID accountId, UUID categoryId, TransactionType type,
             LocalDate startDate, LocalDate endDate, Pageable pageable) {
         UUID userId = userService.getCurrentUserId();
-        String typeString = type != null ? type.name() : null;
-        // Use unsorted pageable since ORDER BY is handled in native SQL query
-        Pageable unsortedPageable = org.springframework.data.domain.PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
-        return transactionRepository.findByFilters(userId, accountId, categoryId, typeString, startDate, endDate, unsortedPageable)
+        return transactionRepository.findByFilters(userId, accountId, categoryId, type, startDate, endDate, pageable)
                 .map(this::mapToResponse);
     }
 
