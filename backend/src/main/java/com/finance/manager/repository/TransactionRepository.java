@@ -17,9 +17,12 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    @Query("SELECT t FROM Transaction t " +
+    @Query(value = "SELECT t FROM Transaction t " +
            "JOIN FETCH t.account a " +
            "JOIN FETCH t.category c " +
+           "WHERE a.user.id = :userId AND t.deletedAt IS NULL",
+           countQuery = "SELECT COUNT(t) FROM Transaction t " +
+           "JOIN t.account a " +
            "WHERE a.user.id = :userId AND t.deletedAt IS NULL")
     Page<Transaction> findByUserId(@Param("userId") UUID userId, Pageable pageable);
 
@@ -29,12 +32,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "WHERE t.id = :id AND a.user.id = :userId AND t.deletedAt IS NULL")
     Optional<Transaction> findByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
-    @Query("SELECT t FROM Transaction t " +
+    @Query(value = "SELECT t FROM Transaction t " +
            "JOIN FETCH t.account a " +
            "JOIN FETCH t.category c " +
            "WHERE a.user.id = :userId " +
            "AND (:accountId IS NULL OR a.id = :accountId) " +
            "AND (:categoryId IS NULL OR c.id = :categoryId) " +
+           "AND (:type IS NULL OR t.type = :type) " +
+           "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
+           "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
+           "AND t.deletedAt IS NULL",
+           countQuery = "SELECT COUNT(t) FROM Transaction t " +
+           "JOIN t.account a " +
+           "WHERE a.user.id = :userId " +
+           "AND (:accountId IS NULL OR a.id = :accountId) " +
+           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
            "AND (:type IS NULL OR t.type = :type) " +
            "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
            "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
