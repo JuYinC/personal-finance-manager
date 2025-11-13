@@ -41,7 +41,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
            "AND (CAST(:type AS varchar) IS NULL OR t.type = CAST(:type AS varchar)) " +
            "AND (CAST(:startDate AS date) IS NULL OR t.transaction_date >= CAST(:startDate AS date)) " +
            "AND (CAST(:endDate AS date) IS NULL OR t.transaction_date <= CAST(:endDate AS date)) " +
-           "AND t.deleted_at IS NULL",
+           "AND t.deleted_at IS NULL " +
+           "ORDER BY t.transaction_date DESC, t.created_at DESC",
            countQuery = "SELECT COUNT(*) FROM transactions t " +
            "JOIN accounts a ON a.id = t.account_id " +
            "WHERE a.user_id = CAST(:userId AS uuid) " +
