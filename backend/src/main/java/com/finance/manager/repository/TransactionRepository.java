@@ -17,23 +17,45 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.user.id = :userId AND t.deletedAt IS NULL")
+    @Query(value = "SELECT t FROM Transaction t " +
+           "JOIN FETCH t.account a " +
+           "JOIN FETCH t.category c " +
+           "WHERE a.user.id = :userId AND t.deletedAt IS NULL",
+           countQuery = "SELECT COUNT(t) FROM Transaction t " +
+           "JOIN t.account a " +
+           "WHERE a.user.id = :userId AND t.deletedAt IS NULL")
     Page<Transaction> findByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.id = :id AND t.account.user.id = :userId AND t.deletedAt IS NULL")
+    @Query("SELECT t FROM Transaction t " +
+           "JOIN FETCH t.account a " +
+           "JOIN FETCH t.category c " +
+           "WHERE t.id = :id AND a.user.id = :userId AND t.deletedAt IS NULL")
     Optional<Transaction> findByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.user.id = :userId " +
-           "AND (:accountId IS NULL OR t.account.id = :accountId) " +
-           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
-           "AND (:type IS NULL OR t.type = :type) " +
-           "AND (:startDate IS NULL OR t.transactionDate >= :startDate) " +
-           "AND (:endDate IS NULL OR t.transactionDate <= :endDate) " +
-           "AND t.deletedAt IS NULL")
+    @Query(value = "SELECT t.* FROM transactions t " +
+           "JOIN accounts a ON a.id = t.account_id " +
+           "JOIN categories c ON c.id = t.category_id " +
+           "WHERE a.user_id = CAST(:userId AS uuid) " +
+           "AND (CAST(:accountId AS uuid) IS NULL OR t.account_id = CAST(:accountId AS uuid)) " +
+           "AND (CAST(:categoryId AS uuid) IS NULL OR t.category_id = CAST(:categoryId AS uuid)) " +
+           "AND (CAST(:type AS varchar) IS NULL OR t.type = CAST(:type AS varchar)) " +
+           "AND (CAST(:startDate AS date) IS NULL OR t.transaction_date >= CAST(:startDate AS date)) " +
+           "AND (CAST(:endDate AS date) IS NULL OR t.transaction_date <= CAST(:endDate AS date)) " +
+           "AND t.deleted_at IS NULL",
+           countQuery = "SELECT COUNT(*) FROM transactions t " +
+           "JOIN accounts a ON a.id = t.account_id " +
+           "WHERE a.user_id = CAST(:userId AS uuid) " +
+           "AND (CAST(:accountId AS uuid) IS NULL OR t.account_id = CAST(:accountId AS uuid)) " +
+           "AND (CAST(:categoryId AS uuid) IS NULL OR t.category_id = CAST(:categoryId AS uuid)) " +
+           "AND (CAST(:type AS varchar) IS NULL OR t.type = CAST(:type AS varchar)) " +
+           "AND (CAST(:startDate AS date) IS NULL OR t.transaction_date >= CAST(:startDate AS date)) " +
+           "AND (CAST(:endDate AS date) IS NULL OR t.transaction_date <= CAST(:endDate AS date)) " +
+           "AND t.deleted_at IS NULL",
+           nativeQuery = true)
     Page<Transaction> findByFilters(@Param("userId") UUID userId,
                                     @Param("accountId") UUID accountId,
                                     @Param("categoryId") UUID categoryId,
-                                    @Param("type") TransactionType type,
+                                    @Param("type") String type,
                                     @Param("startDate") LocalDate startDate,
                                     @Param("endDate") LocalDate endDate,
                                     Pageable pageable);
@@ -44,7 +66,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("SELECT COUNT(t) > 0 FROM Transaction t WHERE t.category.id = :categoryId AND t.deletedAt IS NULL")
     boolean existsActiveByCategoryId(@Param("categoryId") UUID categoryId);
 
-    @Query("SELECT t FROM Transaction t WHERE t.account.user.id = :userId " +
+    @Query("SELECT t FROM Transaction t " +
+           "JOIN FETCH t.account a " +
+           "JOIN FETCH t.category c " +
+           "WHERE a.user.id = :userId " +
            "AND t.type = :type " +
            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
            "AND t.deletedAt IS NULL")
