@@ -33,7 +33,37 @@ public class TransactionService {
             UUID accountId, UUID categoryId, TransactionType type,
             LocalDate startDate, LocalDate endDate, Pageable pageable) {
         UUID userId = userService.getCurrentUserId();
-        return transactionRepository.findByFilters(userId, accountId, categoryId, type, startDate, endDate, pageable)
+
+        // Map Java field names to database column names for native queries
+        Pageable mappedPageable = pageable;
+        if (pageable.getSort().isSorted()) {
+            org.springframework.data.domain.Sort mappedSort = org.springframework.data.domain.Sort.by(
+                pageable.getSort().stream()
+                    .map(order -> {
+                        String property = order.getProperty();
+                        // Map entity field names to database column names
+                        String columnName = switch (property) {
+                            case "transactionDate" -> "transaction_date";
+                            case "createdAt" -> "created_at";
+                            case "updatedAt" -> "updated_at";
+                            case "accountId" -> "account_id";
+                            case "categoryId" -> "category_id";
+                            default -> property;
+                        };
+                        return order.isAscending()
+                            ? org.springframework.data.domain.Sort.Order.asc(columnName)
+                            : org.springframework.data.domain.Sort.Order.desc(columnName);
+                    })
+                    .toList()
+            );
+            mappedPageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                mappedSort
+            );
+        }
+
+        return transactionRepository.findByFilters(userId, accountId, categoryId, type, startDate, endDate, mappedPageable)
                 .map(this::mapToResponse);
     }
 

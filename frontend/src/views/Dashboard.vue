@@ -230,14 +230,14 @@ const fetchTrends = async () => {
       datasets: [
         {
           label: 'Income',
-          data: data.map(d => d.totalIncome),
+          data: data.map(d => d.income),
           borderColor: '#67c23a',
           backgroundColor: 'rgba(103, 194, 58, 0.1)',
           tension: 0.3
         },
         {
           label: 'Expenses',
-          data: data.map(d => d.totalExpense),
+          data: data.map(d => d.expense),
           borderColor: '#f56c6c',
           backgroundColor: 'rgba(245, 108, 108, 0.1)',
           tension: 0.3

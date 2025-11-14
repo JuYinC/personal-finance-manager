@@ -40,7 +40,7 @@
                 <span class="category-name">{{ item.categoryName }}</span>
               </div>
               <div class="category-stats">
-                <span class="category-amount">${{ formatNumber(item.totalAmount) }}</span>
+                <span class="category-amount">${{ formatNumber(item.amount) }}</span>
                 <span class="category-percentage">{{ item.percentage.toFixed(1) }}%</span>
               </div>
             </div>
@@ -180,7 +180,7 @@ const fetchCategoryReport = async () => {
       labels: data.map(item => item.categoryName),
       datasets: [
         {
-          data: data.map(item => item.totalAmount),
+          data: data.map(item => item.amount),
           backgroundColor: colors,
           borderWidth: 2,
           borderColor: '#fff'
@@ -204,7 +204,7 @@ const fetchSummary = async () => {
     const data = await reportAPI.getSummary(params)
     summary.totalIncome = data.totalIncome
     summary.totalExpense = data.totalExpense
-    summary.balance = data.balance
+    summary.balance = data.netSavings
   } catch (error) {
     console.error('Failed to fetch summary:', error)
   }
