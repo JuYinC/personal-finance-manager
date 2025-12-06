@@ -23,6 +23,7 @@ public class ReportService {
     private final TransactionRepository transactionRepository;
     private final UserService userService;
 
+
     public SummaryResponse getSummary(Integer month, Integer year) {
         UUID userId = userService.getCurrentUserId();
         YearMonth yearMonth = YearMonth.of(year, month);
