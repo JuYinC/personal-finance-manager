@@ -1,5 +1,6 @@
 package com.finance.manager.security;
 
+import com.finance.manager.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,20 +9,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,22 +31,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt)) {
-                String username = jwtUtil.extractUsername(jwt);
+            if (StringUtils.hasText(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // 1. Extract userId from the token (no DB call yet — just claim parsing).
+                UUID userId = jwtUtil.extractUserId(jwt);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                // 2. Load the user entity to compare tokenVersion (one indexed DB lookup by PK).
+                User user = userDetailsService.loadUserEntityById(userId);
 
-                    if (jwtUtil.validateToken(jwt, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication =
+                // 3. Validate signature + expiry + tokenVersion atomically.
+                if (jwtUtil.validateTokenClaims(jwt, userId, user.getTokenVersion())) {
+                    UserDetails userDetails = UserDetailsServiceImpl.buildUserDetails(user);
+
+                    UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
                             );
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception ex) {

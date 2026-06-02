@@ -10,11 +10,11 @@ import com.finance.manager.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -40,19 +39,11 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String token = jwtUtil.generateToken(userDetails);
-
-        return AuthResponse.builder()
-                .token(token)
-                .type("Bearer")
-                .userId(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .build();
+        return buildAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
+        // Authenticate using email + password (AuthenticationManager uses email as username)
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
@@ -60,9 +51,27 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ValidationException("User not found"));
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String token = jwtUtil.generateToken(userDetails);
+        return buildAuthResponse(user);
+    }
 
+    /**
+     * Logout: increment tokenVersion so all existing tokens for this user are immediately invalid.
+     * The client is responsible for discarding its local copy of the token.
+     */
+    @Transactional
+    public void logout(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException("User not found"));
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        userRepository.save(user);
+    }
+
+    // ---------------------------------------------------------------
+    // Internal helpers
+    // ---------------------------------------------------------------
+
+    private AuthResponse buildAuthResponse(User user) {
+        String token = jwtUtil.generateToken(user);
         return AuthResponse.builder()
                 .token(token)
                 .type("Bearer")

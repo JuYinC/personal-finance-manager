@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-add-token-version-to-users
+      author: finance-manager
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: token_version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

@@ -4,13 +4,17 @@ import com.finance.manager.dto.auth.AuthResponse;
 import com.finance.manager.dto.auth.LoginRequest;
 import com.finance.manager.dto.auth.RegisterRequest;
 import com.finance.manager.service.AuthService;
+import com.finance.manager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,19 +23,33 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user", description = "Creates a new user account and returns JWT token")
+    @Operation(summary = "Register a new user", description = "Creates a new user account and returns a JWT token")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login user", description = "Authenticates user credentials and returns JWT token")
+    @Operation(summary = "Login user", description = "Authenticates user credentials and returns a JWT token")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(
+        summary = "Logout user",
+        description = "Increments the user's tokenVersion, immediately invalidating all existing tokens. " +
+                      "The client must discard its local token. Re-login is required to continue."
+    )
+    public ResponseEntity<Void> logout() {
+        UUID currentUserId = userService.getCurrentUserId();
+        authService.logout(currentUserId);
+        return ResponseEntity.noContent().build();
     }
 
 }

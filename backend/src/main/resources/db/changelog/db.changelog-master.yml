@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/005-create-budgets-table.yml
   - include:
       file: db/changelog/changes/006-seed-default-categories.yml
+  - include:
+      file: db/changelog/changes/007-add-token-version-to-users.yml

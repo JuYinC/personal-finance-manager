@@ -1,5 +1,6 @@
 package com.finance.manager.controller;
 
+import com.finance.manager.dto.auth.AuthResponse;
 import com.finance.manager.dto.user.ChangePasswordRequest;
 import com.finance.manager.dto.user.UpdateUserRequest;
 import com.finance.manager.dto.user.UserResponse;
@@ -36,10 +37,15 @@ public class UserController {
     }
 
     @PutMapping("/me/password")
-    @Operation(summary = "Change password", description = "Changes the authenticated user's password")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(request);
-        return ResponseEntity.noContent().build();
+    @Operation(
+        summary = "Change password",
+        description = "Changes the authenticated user's password and returns a fresh JWT token. " +
+                      "The client should replace its stored token with the one returned. " +
+                      "The current session continues uninterrupted."
+    )
+    public ResponseEntity<AuthResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        AuthResponse response = userService.changePassword(request);
+        return ResponseEntity.ok(response);
     }
 
 }
